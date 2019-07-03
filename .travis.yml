@@ -6,8 +6,8 @@ xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone X
 before_install:
     - pod install
 after_success:
-    - gem install jazzy
-    - make documentation
+    #- gem install jazzy
+    #- make documentation
 deploy:
   provider: pages
   skip-cleanup: true
