@@ -7,22 +7,20 @@ env:
   - APP_WORKSPACE_PATH="$PWD/TravisCIBlog.xcworkspace"
   - 'DEVELOPER_NAME="iPhone Distribution: V2Solutions Inc (X5E35DL2Y9)"'
   - PROFILE_NAME="GPS_QA_AdHoc_Profile"
-  - secure: He3rqGTCZ3/SqQ721PjiiRCZ9hiNcb/IcbuqGeiHl2QsVo8xZXsaJ+KUH3jb6nx8yFYN+00592tBzlU0IlZ5hI2I/KMf/uc72qnTY8ZM0xNOJ7bYRHEemb/VBDGo2/hqM1go6iRErtFV2UUs0tlZKuUYiWb2G9Dy4k6ydb7vNgfbY7M8aFp5GIvJy5omYU9HXFVjNhnhLMLJNlZTRUIE9k0tx2WN926szCWcP3g2qkISY/cQ5FdrgR68EKJ6mr4Klyc/T58y4zMQigJcYjP2oChjrD2PQbSBX+T+6UcWgBuNZHrozVMuhdCnbrBQ/MIuKaHF79SuCU8ja1VXR5jmouUoEZ9WExVBd+kxg1Hh8jfSIhJ85SLmxYCYP0goNeK/UWBxMfqNaKodEeLRENan1vhCB//QH+H7cBMdF0vT8xniIhzl2sFWiNbP/iVlH7szWND6ofrYMJQcykF86BOJxk1lRz9ql/9GCgwtUkEv9IQshkckgRWoB8FqmjxKL/EVmwmDH11wXyhKsuXhSlqMpoReb36fhMzVDthtWz2H4qjUuhQoiuil7Ln0QLVBkXwSu0q0CNVE5YnNECcderJV/+F6XBL73pyslOZ8LnVD2oaWoGnjKFum6WQZnuHkYzNzKdJYDsWv0JRKNYNumWYX+UFVhttq1fsDL5s01aYlJDQ=
+  - secure: V42CRnp+Pg1bUBaI5BFkclHSeWpxQ5mtElwAqRFx0ZH2jXIlxBGZHWhAGKwwOCcmhfOJgxlaHf+Bg3lakMktboGeTlsrxEExOoqaGsHyRdjgXF/d6ZSkbqLQa/SbPpVV5cznQSHx+Ich5BnHAaO9+l5yoj5b2vDf2wITa1stDK41oRMxgJGYJPABcILKr2yCaymXMpqbnBwlxVk50CwIkRVFdEHG9RhNj/y0DZhH2WNW1vfLhOoh/HierS5UfWNaqpf+qMHHrP5t8Vxe8udeuScfyzNFrUuFYtybpqF1sdWwzrLmZrtZruaBkxlOZostWPxi4CrH7sqRm0DqLKHYDnHMSp4rxyLiHTHnkmRmGQKnso+eCtRFaiVVYAQTAHRkmHaJg8CvYgqD9+faSGW4wZNAN/Hj6XM6GML6ytnC1S0YMZdywF7fzpYtVxIUwZfZiUHVdximfFkdbR9KLSM41siuYXFI4Vrp7UXNq6LZ3DODvvJhgrIhiEL+xnsKKuV6YI/gamvvrlpX1Qb0HGX+NwTkjWRVTvZrfrOr+mmpJ+6TjzSNWJ5v3Q6TWl0pX/8Mx6XLZq8es+noHcsvvZdtfpk79NvcOYNdZCzQKL+43zTOvKM4XRuW5qmv18IVcutYx9kjDp7Pfn/D8njDPn2ho4OfMbixOFYMSKq6SchokJU=
 before_script:
-#- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/GPS_QA_AdHoc_Profile.mobileprovision.enc -d -a -out secureCerts/GPS_QA_AdHoc_Profile.mobileprovision
-#- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/dist.cer.enc -d -a -out secureCerts/dist.cer
-#- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/dist.p12.enc -d -a -out secureCerts/dist.p12
-
-
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/GPS_QA_AdHoc_Profile.mobileprovision.enc -d -a -out secureCerts/GPS_QA_AdHoc_Profile.mobileprovision
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/dist.cer.enc -d -a -out secureCerts/dist.cer
-- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/dist.p12.enc -d -a -out secureCerts/dist.p12
-- "secureCerts/add-key.sh"
-
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/GPS_QA_AdHoc_Profile.mobileprovision.enc
+  -d -a -out secureCerts/GPS_QA_AdHoc_Profile.mobileprovision
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/dist.cer.enc -d -a -out
+  secureCerts/dist.cer
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in secureCerts/dist.p12.enc -d -a -out
+  secureCerts/dist.p12
+- secureCerts/add-key.sh
 before_install: 
 script:
-- travis_retry xcodebuild -workspace $APP_WORKSPACE_PATH -scheme qa -sdk iphoneos OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
+- travis_retry xcodebuild -workspace $APP_WORKSPACE_PATH -scheme qa -sdk iphoneos
+  OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
 after_success:
-- "secureCerts/sign-and-upload.sh"
+- secureCerts/sign-and-upload.sh
 after_script:
-- "secureCerts/remove-key.sh"
+- secureCerts/remove-key.sh
