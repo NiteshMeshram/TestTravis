@@ -18,7 +18,7 @@ before_script:
 - secureCerts/add-key.sh
 before_install: 
 script:
-- travis_retry xcodebuild -workspace $APP_WORKSPACE_PATH -scheme qa -sdk iphoneos
+- travis_retry xcodebuild -workspace $APP_WORKSPACE_PATH -scheme TravisCIBlog -sdk iphoneos
   OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
 after_success:
 - secureCerts/sign-and-upload.sh
