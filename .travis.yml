@@ -1,17 +1,41 @@
+#language: objective-c
+#osx_image: xcode10.1
+#xcode_workspace: TravisCIBlog.xcworkspace # path to your xcodeproj folder
+#xcode_scheme: TravisCIBlog
+#xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone X
+#before_install:
+#    - pod install
+#after_success:
+
+###############################
+
+
 language: objective-c
 osx_image: xcode10.1
-xcode_workspace: TravisCIBlog.xcworkspace # path to your xcodeproj folder
-xcode_scheme: TravisCIBlog
-xcode_destination: platform=iOS Simulator,OS=12.1,name=iPhone X
+env:
+  global:
+  - APP_NAME="GPS-QA"
+  - APP_SCRIPT_PATH="$PWD/secureCerts"
+  - APP_WORKSPACE_PATH="$PWD/ios/Runner.xcworkspace"
+  - 'DEVELOPER_NAME="iPhone Distribution: V2Solutions Inc (X5E35DL2Y9)"'
+  - PROFILE_NAME="GPS_QA_AdHoc_Profile"
+  - secure: TfAn9LMAc0bOhf98JmYY0WAuYt8GBKAx9YRY5qketMzppqHo7zpXbdBevRoGWq6VlgG9IOb2iFQwSZ18SF6TQhdUy8bEd6r12F/sOaQMr4J/1Zw5E77IvmUyfh/ISo+clnXHTX8d9s1IOvOKahMto6mITeXYfY4RUHFaF2NUOu40woEkFrpywCMXqrX+ttYZnsP+YyR3mESrQ2n15d5kHw+154zWQslThkTm24VMshGGUKhNAkJ/wxc47CrYEA4I+Hl54mIyxxU1lx59RMryZKqwAySJvBHyRXhluQyZstqSHu+3ZrOR5o617gxn5ROq/4B5EtVt4lkE3voZ4LWK+tSdfiO0Q0D2hpoXi0WZDYUZgn213TFFdGbMgzLAyNQrvXZxNiWEBsdfWG0o5ACa0FV5zHJHRSKt5FYQC5sX2eUUrgtXUcC6miS0r9JtnG6JRUAHZ3Kh0tC4Ie3AbqELcM+YMkdJaodhAlE/DbcSFUg6PzZuXXqUrtqH1L9jWH4TxRcOQUfEsOBmBwpzQj4GsDCd7sH4tGWIibBAkchUxUr2Zmp19kHO6aSGNn9LagbALAAQQuZt4aX46N75Nkb4UDftyv6qn36NfULTFDz06/4lp/FFRHNbAZy175rgFbLB9lByrzFwIyx3KSBr//XZE7ZEd2XtUQqJm2WAlftCunE=
+  - secure: FN+CIzwm6colrUjXOO0AjAUg1dYVI5J5OGySio5dRIZr7ZRlNoiMkMBUJKp47QTaP/bqhHtlkdjSs63uvunOle/SPbT3mbjejeiMTc/LbtSF04YAd+3ViwvjsuZ1ZtDORLS1uaQ/T8Onu3miTzzZYFsTQb9Im5ff4i0Vb+pcnP7TRd5o2LW5xd7Q3576rD8yXHlAmODgL6WvZREl0LtFvPB3Inuad/2aD+yNclXxFTQLE/8HeMjEJzXUtj0SVRoBytvYjntEJ5EnSBpWWzhVQagkaDahWRcT4TRWRv54xdaeqexEMmiBiiuCcJsItCrbx49ZANtgdFxoU03hMSlw033nY7Hh66sAjHTOITjP7yMi2RQjRCd34wgRfFICp3etqrFWjCCzA3IMdlJkT8qmcCcqgl0DDvC94f3Fs45QFFug6iw0pPrPyqU8hyNxJTVOrhPfXTiWYeUQyQDl6fQZSeCiZT7n8yDgV4jh21zNx+EF11w6csxkP5FCc8DhFR7ZeMqjoeqzulZij+FqklrXnewQVYZStJw9SQoQ2CAs1pwSTu/NXYAtQ3ph/8MF3VwBxc3Eeto8N3eC8w4tq7G9bAfSBZoSS89fTB05iKwGuHS4cGtkAXgU0ulQOvUI9/PEhlpV4PD2uscleaS+0MTMTc0CG+Jiit5UfzB9O31YdJo=
+before_script: 
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in $APP_SCRIPT_PATH/GPS_QA_AdHoc_Profile.mobileprovision.enc -d -a -out $APP_SCRIPT_PATH/GPS_QA_AdHoc_Profile.mobileprovision
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in $APP_SCRIPT_PATH/dist.cer.enc -d -a -out $APP_SCRIPT_PATH/dist.cer
+- openssl aes-256-cbc -k "$ENCRYPTION_SECRET" -in $APP_SCRIPT_PATH/dist.p12.enc -d -a -out $APP_SCRIPT_PATH/dist.p12
+- $APP_SCRIPT_PATH/add-key.sh
+
 before_install:
-    - pod install
-after_success:
-    #- gem install jazzy
-    #- make documentation
-#deploy:
-  #provider: pages
-  #skip-cleanup: true
-  #github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
-  #local-dir: docs
-  #on:
-  #  branch: master
+#- pod install --project-directory=ios
+script:
+#- travis_retry xcodebuild -workspace $APP_WORKSPACE_PATH -scheme Runner -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
+#- xctool -workspace $APP_WORKSPACE_PATH -scheme qa -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
+- travis_retry xcodebuild -workspace $APP_WORKSPACE_PATH -scheme qa -sdk iphoneos OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
+
+after_success: 
+- $APP_SCRIPT_PATH/sign-and-upload.sh
+
+after_script:
+- $APP_SCRIPT_PATH/remove-key.sh
