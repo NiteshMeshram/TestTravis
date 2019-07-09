@@ -19,7 +19,7 @@ before_script:
 before_install: 
 script:
 #- travis_retry xcodebuild -workspace $APP_WORKSPACE_PATH -scheme Debug -sdk iphoneos
-  OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
+  #OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO
 
 - xcodebuild -workspace $APP_WORKSPACE_PATH -scheme TravisCIBlog -sdk iphoneos -configuration Release OBJROOT=$PWD/build SYMROOT=$PWD/build ONLY_ACTIVE_ARCH=NO 
 #'CODE_SIGN_RESOURCE_RULES_PATH=$(SDKROOT)/ResourceRules.plist'
